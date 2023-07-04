@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Banners</title>
+    <style>
+      .image {
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+      }
+
+      .image-to-show {
+        width: 400px;
+        height: 400px;
+        display: inline-block;
+        margin: 15px auto;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.5s ease;
+      }
+
+      .images-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        text-align: center;
+      }
+      .btn {
+        padding: 20px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 50px;
+      }
+      .btn__stop {
+        display: block;
+        margin: 0 auto;
+        margin-top: 15px;
+      }
+      .btn__continue {
+        display: block;
+        margin: 0 auto;
+        margin-top: 15px;
+      }
+      .timer {
+        text-align: center;
+        margin-top: 15px;
+        padding: 20px;
+        background-color: darkblue;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="images-wrapper">
+      <img src="./img/1.jpg" alt="image of game" class="image" data-index="0" />
+      <img src="./img/2.jpg" alt="image of game" class="image" data-index="1" />
+      <img src="./img/3.JPG" alt="image of game" class="image" data-index="2" />
+      <img src="./img/4.png" alt="image of game" class="image" data-index="3" />
+    </div>
+    <div class="btn-wrapper">
+      <button class="btn btn__stop">Припинити</button>
+      <button class="btn btn__continue">Відновити</button>
+    </div>
+    <div class="timer"></div>
+
+    <script>
+      let images = document.querySelectorAll('.image');
+      let stopBtn = document.querySelector('.btn__stop');
+      let continueBtn = document.querySelector('.btn__continue');
+      let timer = document.querySelector('.timer');
+
+      let startImageIndex = 0;
+      let imageIntervalTime = 3000;
+
+      let showImageTimeout;
+      let timerInterval;
+
+      showImageByIndex(startImageIndex);
+
+      function showImageByIndex(imageIndex) {
+        startTimer();
+
+        images[imageIndex].classList.add('image-to-show');
+        imageIndex++;
+        if (imageIndex < images.length) {
+          showImageTimeout = setTimeout(() => {
+            images[imageIndex - 1].classList.remove('image-to-show');
+            showImageByIndex(imageIndex);
+          }, imageIntervalTime);
+        } else if (imageIndex >= images.length) {
+          imageIndex = 0;
+          showImageTimeout = setTimeout(() => {
+            images[images.length - 1].classList.remove('image-to-show');
+            showImageByIndex(imageIndex);
+          }, imageIntervalTime);
+        }
+      }
+
+      function startTimer() {
+        let startTime = Date.now();
+        timerInterval = setInterval(() => {
+          let elapsedTime = Date.now() - startTime;
+          if (elapsedTime >= imageIntervalTime) {
+            clearInterval(timerInterval);
+          } else {
+            let secondsLeft = (imageIntervalTime - elapsedTime) / 1000;
+            let milisecondsLeft = (imageIntervalTime - elapsedTime) % 1000;
+            timer.textContent = `${secondsLeft}s ${milisecondsLeft}ms`;
+          }
+        }, 100);
+      }
+      stopBtn.addEventListener('click', () => {
+        clearTimeout(showImageTimeout);
+        clearInterval(timerInterval);
+      });
+
+      continueBtn.addEventListener('click', () => {
+        let currentImage = document.querySelector('.image-to-show');
+        let currentImageIndex = currentImage.dataset.index;
+        showImageByIndex(currentImageIndex);
+      });
+    </script>
+  </body>
+</html>
